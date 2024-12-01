@@ -5,13 +5,13 @@ SELECT
   w.wishes->'colors'->>0 as favourite_color,
   jsonb_array_length((w.wishes -> 'colors')::jsonb) as color_count,
   CASE
-    WHEN GREATEST(CAST(t1.difficulty_to_make AS INT), CAST(t2.difficulty_to_make AS INT)) = 1 THEN 'Simple Gift'
-    WHEN GREATEST(CAST(t1.difficulty_to_make AS INT), CAST(t2.difficulty_to_make AS INT)) = 2 THEN 'Moderate Gift'
+    WHEN t.difficulty_to_make = 1 THEN 'Simple Gift'
+    WHEN t.difficulty_to_make = 2 THEN 'Moderate Gift'
     ELSE 'Complex Gift'
   END AS gift_complexity,
   CASE 
-    WHEN t1.category = 'outdoor' THEN 'Outside Workshop'
-    WHEN t1.category = 'educational' THEN 'Learning Workshop'
+    WHEN t.category = 'outdoor' THEN 'Outside Workshop'
+    WHEN t.category = 'educational' THEN 'Learning Workshop'
     ELSE 'General Workshop'
   END AS workshop_assignment
 FROM 
@@ -21,10 +21,8 @@ JOIN
 ON 
   c.child_id = w.child_id
 JOIN
-  toy_catalogue t1
+  toy_catalogue t
 ON
-  t1.toy_name = w.wishes->>'first_choice'
-JOIN
-  toy_catalogue t2
-ON
-  t2.toy_name = w.wishes->>'second_choice'
+  t.toy_name = w.wishes->>'first_choice'
+ORDER BY c.name ASC
+LIMIT 5
